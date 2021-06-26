@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Text</title>
+    <style>
+        html, body {
+           margin: 0;
+           height: 100%;
+        }
+        #c {
+           width: 100%;
+           height: 100%;
+           display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="c"></canvas>
+    
+   <script type="module">
+        import * as THREE from 'https://threejsfundamentals.org/threejs/resources/threejs/r127/build/three.module.js';
+
+        function main (){
+
+            const canvas = document.querySelector('#c');
+            const renderer = new THREE.WebGLRenderer({canvas})
+
+            const fov = 40;
+            const aspect = 2;  // the canvas default
+            const near = 0.1;
+            const far = 1000;
+            const camera = new THREE.PerspectiveCamera(fov,aspect,near,far);
+            camera.position.z = (window.innerWidth > 686 )?120:300;
+
+            const scene = new THREE.Scene();
+
+            {
+                const color = 0xFFFFFF;
+                const intensity = 1;
+                const light = new THREE.DirectionalLight(color, intensity);
+                light.position.set(-1, 2, 4);
+                scene.add(light);
+            }
+            {
+                const color = 0xFFFFFF;
+                const intensity = 1;
+                const light = new THREE.DirectionalLight(color, intensity);
+                light.position.set(1, -2, -4);
+                scene.add(light);
+            }
+
+            {
+                const loader = new THREE.FontLoader();
+                // promisify font loading
+                function loadFont(url) {
+                    return new Promise((resolve, reject) => {
+                    loader.load(url, resolve, undefined, reject);
+                    });
+            }
+            
+            const makeMaterial = () => {
+                const color = 0x44aa88;
+                const material = new THREE.MeshPhongMaterial({color});
+                const hue = Math.random();
+                const saturation = 1;
+                const luminance = .5;
+                material.color.setHSL(hue, saturation, luminance);
+                return material
+            }
+
+            const fontSetting = (font) =>{
+                return{
+                    font: font,
+                    size: 4.0,
+                    height: .2,
+                    curveSegments: 12,
+                    bevelEnabled: true,
+                    bevelThickness: 0.95,
+                    bevelSize: .3,
+                    bevelSegments: 5,
+                }
+                
+            }
+
+            const makeInstance = (text,font) => {
+                const geometry = new THREE.TextGeometry(text, fontSetting(font));
+                
+                const mesh = new THREE.Mesh(geometry, makeMaterial());
+                geometry.computeBoundingBox();
+                geometry.boundingBox.getCenter(mesh.position).multiplyScalar(-1);
+                return mesh;
+            }
+
+            async function doit() {
+                const font = await loadFont('https://threejsfundamentals.org/threejs/resources/threejs/fonts/helvetiker_regular.typeface.json');  
+                
+                
+                const parent = new THREE.Object3D();
+                parent.add(makeInstance('PIED PIPERS',font))
+                parent.position.x = 0;
+                parent.position.y = 30;
+
+                const parent2 = new THREE.Object3D();
+                parent2.add(makeInstance('Jay Patel',font))
+                parent2.position.x = 0;
+                parent2.position.y = 0;
+
+                const parent3 = new THREE.Object3D();
+                parent3.add(makeInstance('Jay Gohil',font))
+                parent3.position.x = -40;
+                parent3.position.y = 20;
+
+                const parent4 = new THREE.Object3D()
+                parent4.add(makeInstance('Jay Chopra',font))
+                parent4.position.x = 40;
+                parent4.position.y = 20;
+
+                const parent5 = new THREE.Object3D()
+                parent5.add(makeInstance('Jay Panchal',font))
+                parent5.position.x = 40;
+                parent5.position.y = 0;
+
+                const parent6 = new THREE.Object3D()
+                parent6.add(makeInstance('Ketul Chhaya',font))
+                parent6.position.x = -40;
+                parent6.position.y = 0;
+
+                const parent7 = new THREE.Object3D()
+                parent7.add(makeInstance('Yash Patel',font))
+                parent7.position.x = 40;
+                parent7.position.y = -20;
+
+                const parent8 = new THREE.Object3D()
+                parent8.add(makeInstance('Dhaval Jain',font))
+                parent8.position.x = -40;
+                parent8.position.y = -20;
+
+                scene.add(parent);
+                scene.add(parent2);
+                scene.add(parent3);
+                scene.add(parent4);
+                scene.add(parent5);
+                scene.add(parent6);
+                scene.add(parent7);
+                scene.add(parent8);
+                
+
+                objects.push(parent,parent2,parent3,parent4,parent5,parent6,parent7,parent8);
+                
+            }
+                doit();
+            }
+
+            
+
+            const objects = [
+                        
+            ];
+
+            renderer.render(scene, camera);
+            
+            function resizeRendererToDisplaySize(renderer) {
+                const canvas = renderer.domElement;
+                const pixelRatio = window.devicePixelRatio;
+                const width  = canvas.clientWidth  * pixelRatio | 0;
+                const height = canvas.clientHeight * pixelRatio | 0;
+                const needResize = canvas.width !== width || canvas.height !== height;
+                if (needResize) {
+                    renderer.setSize(width, height, false);
+                }
+                return needResize;
+            }
+
+            
+
+            function render (time) {
+                time *= 0.001;
+
+                if (resizeRendererToDisplaySize(renderer)) {
+                    const canvas = renderer.domElement;
+                    camera.aspect = canvas.clientWidth / canvas.clientHeight;
+                    camera.updateProjectionMatrix();
+                }
+
+                objects.forEach((object, ndx) => {
+                    const speed = .1 ;
+                    const rot = time * speed;
+                    object.rotation.x = rot;
+                    object.rotation.y = rot;
+                });
+                
+                renderer.render(scene,camera);
+
+                requestAnimationFrame(render)
+            }
+            requestAnimationFrame(render)
+        }
+        main();
+
+
+   </script>
+</body>
+</html>
