@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bouncing Shadow</title>
+</head>
+<style>
+html, body {
+            height: 100%;
+            margin: 0;
+        }
+        #c {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        #loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #loading .progress {
+            margin: 1.5em;
+            border: 1px solid white;
+            width: 50vw;
+        }
+        #loading .progressbar {
+            margin: 2px;
+            background: white;
+            height: 1em;
+            transform-origin: top left;
+            transform: scaleX(0);
+            transition:0.5s ease;
+        }
+</style>
+<body>
+    <canvas id="c"></canvas>
+    <div id="loading">
+        <div class="progress"><div class="progressbar"></div></div>
+      </div>
+
+      <script type="module">
+            import * as THREE from 'https://threejsfundamentals.org/threejs/resources/threejs/r127/build/three.module.js';
+            import {OrbitControls} from 'https://threejsfundamentals.org/threejs/resources/threejs/r127/examples/jsm/controls/OrbitControls.js';
+
+            function main (){
+                const loadingElem = document.querySelector('#loading');
+                const progressBarElem = loadingElem.querySelector('.progressbar');
+                const canvas = document.querySelector('#c');
+                const renderer = new THREE.WebGLRenderer({canvas});
+                renderer.physicallyCorrectLights = true;
+
+
+                const loadManager = new THREE.LoadingManager();
+                const loader = new THREE.TextureLoader(loadManager);
+                //Camera
+                const fov =45;
+                const aspect = 2;
+                const near = 0.1;
+                const far = 100;
+                const camera = new THREE.PerspectiveCamera(fov,aspect,near,far);
+                camera.position.set(0, 10, 20);
+                camera.lookAt(0, 0, 0);
+                
+                const controls = new OrbitControls(camera, canvas);
+                controls.target.set(0, 5, 0);
+                controls.update();
+
+                const scene = new THREE.Scene();
+                scene.background = new THREE.Color('white');
+
+            {
+                const loader = new THREE.FontLoader();
+                // promisify font loading
+                function loadFont(url) {
+                    return new Promise((resolve, reject) => {
+                    loader.load(url, resolve, undefined, reject);
+                    });
+                }
+            
+            const makeMaterial = () => {
+                const color = 0x44aa88;
+                const material = new THREE.MeshPhongMaterial({color});
+                const hue = Math.random();
+                const saturation = 1;
+                const luminance = .5;
+                material.color.setHSL(hue, saturation, luminance);
+                return material
+            }
+
+            const fontSetting = (font) =>{
+                return{
+                    font: font,
+                    size: 1.0,
+                    height: .1,
+                    curveSegments: 8,
+                    bevelEnabled: true,
+                    bevelThickness: 0.25,
+                    bevelSize: .2,
+                    bevelSegments: 2,
+                }
+                
+            }
+
+            const makeInstance = (text,font) => {
+                const geometry = new THREE.TextGeometry(text, fontSetting(font));
+                
+                const mesh = new THREE.Mesh(geometry, makeMaterial());
+                geometry.computeBoundingBox();
+                geometry.boundingBox.getCenter(mesh.position).multiplyScalar(-1);
+                return mesh;
+            }
+
+            async function doit() {
+                const font = await loadFont('https://threejsfundamentals.org/threejs/resources/threejs/fonts/helvetiker_regular.typeface.json');  
+                
+                const parent = new THREE.Object3D();
+                parent.add(makeInstance('PIED PIPERS',font))
+                parent.position.x = 0;
+                parent.position.y = 10;
+
+                scene.add(parent);     
+                
+            }
+                doit();
+            }
+
+                
+
+                {
+                    const planeSize = 40;
+
+                    const texture = loader.load('https://threejsfundamentals.org/threejs/resources/images/checker.png');
+                    texture.wrapS = THREE.RepeatWrapping;
+                    texture.wrapT = THREE.RepeatWrapping;
+                    texture.magFilter = THREE.NearestFilter;
+                    const repeats = planeSize / 2;
+                    texture.repeat.set(repeats, repeats);
+
+                    const planeGeo = new THREE.PlaneGeometry(planeSize, planeSize);
+                    const planeMat = new THREE.MeshBasicMaterial({
+                    map: texture,
+                        side: THREE.DoubleSide,
+                    });
+                    planeMat.color.setRGB(1.5, 1.5, 1.5);
+                    const mesh = new THREE.Mesh(planeGeo, planeMat);
+                    mesh.rotation.x = Math.PI * -.5;
+                    scene.add(mesh);
+                }
+
+                const shadowTexture = loader.load('https://threejsfundamentals.org/threejs/resources/images/roundshadow.png');
+                const sphereShadowBases = [];
+
+
+                function createMaterial() {
+                    const material = new THREE.MeshPhongMaterial({
+                    side: THREE.DoubleSide,
+                    });
+
+                    const hue = Math.random();
+                    const saturation = 1;
+                    const luminance = .5;
+                    material.color.setHSL(hue, saturation, luminance);
+
+                    return material;
+                }
+
+               
+
+                {
+                    const sphereRadius = 1.5;
+                    const sphereWidthDivisions = 32;
+                    const sphereHeightDivisions = 16;
+                    const sphereGeo = new THREE.SphereGeometry(sphereRadius, sphereWidthDivisions, sphereHeightDivisions);
+
+
+                    const materials = [
+                        new THREE.MeshBasicMaterial({map: loader.load('./pp.jpg')}),
+                        new THREE.MeshBasicMaterial({map: loader.load('./pp (1).jpg')}),
+                        new THREE.MeshBasicMaterial({map: loader.load('./pp (2).jpg')}),
+                        new THREE.MeshBasicMaterial({map: loader.load('./pp (3).jpg')}),
+                        new THREE.MeshBasicMaterial({map: loader.load('./pp (4).jpg')}),
+                        new THREE.MeshBasicMaterial({map: loader.load('./pp(5).jpg')}),
+                        new THREE.MeshBasicMaterial({map: loader.load('./pp(6).png')}),
+                    ];
+
+                    loadManager.onLoad = () => {
+                    loadingElem.style.display = 'none';
+                    const cube = new THREE.Mesh(sphereGeo, materials);
+                    
+                    scene.add(cube);
+                
+                }
+
+                loadManager.onProgress = (urlOfLastItemLoaded, itemsLoaded, itemsTotal) => {
+                    const progress = itemsLoaded / itemsTotal;
+                    progressBarElem.style.transform = `scaleX(${progress})`;
+                };
+
+                    const planeSize = 1;
+                    const shadowGeo = new THREE.PlaneGeometry(planeSize, planeSize);
+
+                    
+
+                    const numSpheres = 7;
+
+                    for (let i = 0; i < numSpheres; ++i) {
+                        // make a base for the shadow and the sphere.
+                        // so they move together.
+                        const base = new THREE.Object3D();
+                        scene.add(base);
+
+                        // add the shadow to the base
+                        // note: we make a new material for each sphere
+                        // so we can set that sphere's material transparency
+                        // separately.
+                        const shadowMat = new THREE.MeshBasicMaterial({
+                            map: shadowTexture,
+                            transparent: true,    // so we can see the ground
+                            depthWrite: false,    // so we don't have to sort
+                        });
+                        const shadowMesh = new THREE.Mesh(shadowGeo, shadowMat);
+                        shadowMesh.position.y = 0.001;  // so we're above the ground slightly
+                        shadowMesh.rotation.x = Math.PI * -.5;
+                        const shadowSize = sphereRadius * 4;
+                        shadowMesh.scale.set(shadowSize, shadowSize, shadowSize);
+                        base.add(shadowMesh);
+
+                        // add the sphere to the base
+                        const u = i / numSpheres;
+                        const sphereMat = materials[i]
+                        
+                        const sphereMesh = new THREE.Mesh(sphereGeo, sphereMat);
+                        sphereMesh.position.set(0, sphereRadius + 2, 0);
+                        base.add(sphereMesh);
+
+                        // remember all 3 plus the y position
+                        sphereShadowBases.push({base, sphereMesh, shadowMesh, y: sphereMesh.position.y});
+                    }
+                }
+
+                {
+                    const skyColor = 0xB1E1FF;  // light blue
+                    const groundColor = 0xB97A20;  // brownish orange
+                    const intensity = 2;
+                    const light = new THREE.HemisphereLight(skyColor, groundColor, intensity);
+                    scene.add(light);
+                }
+
+                {
+                    const color = 0xFFFFFF;
+                    const intensity = 1;
+                    const light = new THREE.DirectionalLight(color, intensity);
+                    light.position.set(0, 10, 5);
+                    light.target.position.set(-5, 0, 0);
+                    scene.add(light);
+                    scene.add(light.target);
+                }
+
+                function resizeRendererToDisplaySize(renderer) {
+                    const canvas = renderer.domElement;
+                    const width = canvas.clientWidth;
+                    const height = canvas.clientHeight;
+                    const needResize = canvas.width !== width || canvas.height !== height;
+                    if (needResize) {
+                    renderer.setSize(width, height, false);
+                    }
+                    return needResize;
+                }
+
+                function render(time) {
+                    time *= 0.001;  // convert to seconds
+
+                    resizeRendererToDisplaySize(renderer);
+
+                    {
+                    const canvas = renderer.domElement;
+                    camera.aspect = canvas.clientWidth / canvas.clientHeight;
+                    camera.updateProjectionMatrix();
+                    }
+
+                    sphereShadowBases.forEach((sphereShadowBase, ndx) => {
+                    const {base, sphereMesh, shadowMesh, y} = sphereShadowBase;
+
+                    // u is a value that goes from 0 to 1 as we iterate the spheres
+                    const u = ndx / sphereShadowBases.length;
+
+                    // compute a position for there base. This will move
+                    // both the sphere and its shadow
+                    const speed = time * .3;
+                    const angle = speed + u * Math.PI * 4 * (ndx % 1 ? 1 : -1);
+                    const radius = Math.sin(speed - ndx) * 10;
+                    base.position.set(Math.cos(angle) * radius, 0, Math.sin(angle) * radius);
+
+                    // yOff is a value that goes from 0 to 1
+                    const yOff = Math.abs(Math.sin(time * 2 + ndx));
+                    // move the sphere up and down
+                    sphereMesh.position.y = y + THREE.MathUtils.lerp(-2, 3, yOff);
+                    // fade the shadow as the sphere goes up
+                    shadowMesh.material.opacity = THREE.MathUtils.lerp(1, .25, yOff);
+                    });
+
+                    renderer.render(scene, camera);
+
+                    requestAnimationFrame(render);
+                }
+
+                requestAnimationFrame(render);
+
+
+            } 
+            main()
+      </script>
+</body>
+</html>
