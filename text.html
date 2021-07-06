@@ -22,6 +22,7 @@
     
    <script type="module">
         import * as THREE from 'https://threejsfundamentals.org/threejs/resources/threejs/r127/build/three.module.js';
+        import {OrbitControls} from 'https://threejsfundamentals.org/threejs/resources/threejs/r127/examples/jsm/controls/OrbitControls.js';
 
         function main (){
 
@@ -36,6 +37,19 @@
             camera.position.z = (window.innerWidth > 686 )?120:300;
 
             const scene = new THREE.Scene();
+
+            {
+                const near = 1;
+                const far = (window.innerWidth > 686 )?180:560;
+                const color = 'lightblue';
+                scene.fog = new THREE.Fog(color, near, far);
+                scene.background = new THREE.Color(color);
+            }
+
+
+            const controls = new OrbitControls(camera, canvas);
+            controls.target.set(0, 0, 0);
+            controls.update();
 
             {
                 const color = 0xFFFFFF;
@@ -188,8 +202,25 @@
                 objects.forEach((object, ndx) => {
                     const speed = .1 ;
                     const rot = time * speed;
-                    object.rotation.x = rot;
-                    object.rotation.y = rot;
+                    // object.rotation.x = rot;
+                    // object.rotation.y = rot;
+                    const yOff = Math.abs(Math.sin(time * 1 + ndx));
+                    // move the sphere up and down
+                    object.position.z = 0 + THREE.MathUtils.lerp(-22, 25, yOff);
+                    // object.position.z +=5
+                    // let current = "go";
+                    // if(object.position.z === 100){
+                    //     current = "back"
+                    // }
+                    // else if(object.position.z === 0){
+                    //     current = "go";
+                    // }
+                    // if(current =="go"){
+                    //     object.position.z +=5;
+                    // }
+                    // else{
+                    //     object.position.z -=5;
+                    // }
                 });
                 
                 renderer.render(scene,camera);
