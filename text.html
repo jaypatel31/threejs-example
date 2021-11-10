@@ -18,220 +18,247 @@
     </style>
 </head>
 <body>
-    <canvas id="c"></canvas>
-    
+    <canvas id="c" style="position: absolute;"></canvas>
+    <script src='https://jeromeetienne.github.io/threex.terrain/examples/vendor/three.js/build/three-min.js'></script>
+<script src='https://jeromeetienne.github.io/threex.terrain/examples/vendor/three.js/examples/js/SimplexNoise.js'></script>
+<script src='https://jeromeetienne.github.io/threex.terrain/threex.terrain.js'></script>
+<script src='bower_components/threex.text/threex.text.js'></script>
+<script src="bower_components/threex.text/fonts/droid/droid_serif_bold.typeface.js"></script>
    <script type="module">
-        import * as THREE from 'https://threejsfundamentals.org/threejs/resources/threejs/r127/build/three.module.js';
-        import {OrbitControls} from 'https://threejsfundamentals.org/threejs/resources/threejs/r127/examples/jsm/controls/OrbitControls.js';
-
-        function main (){
-
-            const canvas = document.querySelector('#c');
-            const renderer = new THREE.WebGLRenderer({canvas})
-
-            const fov = 40;
-            const aspect = 2;  // the canvas default
-            const near = 0.1;
-            const far = 1000;
-            const camera = new THREE.PerspectiveCamera(fov,aspect,near,far);
-            camera.position.z = (window.innerWidth > 686 )?120:300;
-
-            const scene = new THREE.Scene();
-
-            {
-                const near = 1;
-                const far = (window.innerWidth > 686 )?180:560;
-                const color = 'lightblue';
-                scene.fog = new THREE.Fog(color, near, far);
-                scene.background = new THREE.Color(color);
-            }
-
-
-            const controls = new OrbitControls(camera, canvas);
-            controls.target.set(0, 0, 0);
-            controls.update();
-
-            {
-                const color = 0xFFFFFF;
-                const intensity = 1;
-                const light = new THREE.DirectionalLight(color, intensity);
-                light.position.set(-1, 2, 4);
-                scene.add(light);
-            }
-            {
-                const color = 0xFFFFFF;
-                const intensity = 1;
-                const light = new THREE.DirectionalLight(color, intensity);
-                light.position.set(1, -2, -4);
-                scene.add(light);
-            }
-
-            {
-                const loader = new THREE.FontLoader();
-                // promisify font loading
-                function loadFont(url) {
-                    return new Promise((resolve, reject) => {
-                    loader.load(url, resolve, undefined, reject);
-                    });
-            }
-            
-            const makeMaterial = () => {
-                const color = 0x44aa88;
-                const material = new THREE.MeshPhongMaterial({color});
-                const hue = Math.random();
-                const saturation = 1;
-                const luminance = .5;
-                material.color.setHSL(hue, saturation, luminance);
-                return material
-            }
-
-            const fontSetting = (font) =>{
-                return{
-                    font: font,
-                    size: 4.0,
-                    height: .2,
-                    curveSegments: 12,
-                    bevelEnabled: true,
-                    bevelThickness: 0.95,
-                    bevelSize: .3,
-                    bevelSegments: 5,
-                }
-                
-            }
-
-            const makeInstance = (text,font) => {
-                const geometry = new THREE.TextGeometry(text, fontSetting(font));
-                
-                const mesh = new THREE.Mesh(geometry, makeMaterial());
-                geometry.computeBoundingBox();
-                geometry.boundingBox.getCenter(mesh.position).multiplyScalar(-1);
-                return mesh;
-            }
-
-            async function doit() {
-                const font = await loadFont('https://threejsfundamentals.org/threejs/resources/threejs/fonts/helvetiker_regular.typeface.json');  
-                
-                
-                const parent = new THREE.Object3D();
-                parent.add(makeInstance('PIED PIPERS',font))
-                parent.position.x = 0;
-                parent.position.y = 30;
-
-                const parent2 = new THREE.Object3D();
-                parent2.add(makeInstance('Jay Patel',font))
-                parent2.position.x = 0;
-                parent2.position.y = 0;
-
-                const parent3 = new THREE.Object3D();
-                parent3.add(makeInstance('Jay Gohil',font))
-                parent3.position.x = -40;
-                parent3.position.y = 20;
-
-                const parent4 = new THREE.Object3D()
-                parent4.add(makeInstance('Jay Chopra',font))
-                parent4.position.x = 40;
-                parent4.position.y = 20;
-
-                const parent5 = new THREE.Object3D()
-                parent5.add(makeInstance('Jay Panchal',font))
-                parent5.position.x = 40;
-                parent5.position.y = 0;
-
-                const parent6 = new THREE.Object3D()
-                parent6.add(makeInstance('Ketul Chhaya',font))
-                parent6.position.x = -40;
-                parent6.position.y = 0;
-
-                const parent7 = new THREE.Object3D()
-                parent7.add(makeInstance('Yash Patel',font))
-                parent7.position.x = 40;
-                parent7.position.y = -20;
-
-                const parent8 = new THREE.Object3D()
-                parent8.add(makeInstance('Dhaval Jain',font))
-                parent8.position.x = -40;
-                parent8.position.y = -20;
-
-                scene.add(parent);
-                scene.add(parent2);
-                scene.add(parent3);
-                scene.add(parent4);
-                scene.add(parent5);
-                scene.add(parent6);
-                scene.add(parent7);
-                scene.add(parent8);
-                
-
-                objects.push(parent,parent2,parent3,parent4,parent5,parent6,parent7,parent8);
-                
-            }
-                doit();
-            }
-
-            
-
-            const objects = [
-                        
-            ];
-
-            renderer.render(scene, camera);
-            
-            function resizeRendererToDisplaySize(renderer) {
-                const canvas = renderer.domElement;
-                const pixelRatio = window.devicePixelRatio;
-                const width  = canvas.clientWidth  * pixelRatio | 0;
-                const height = canvas.clientHeight * pixelRatio | 0;
-                const needResize = canvas.width !== width || canvas.height !== height;
-                if (needResize) {
-                    renderer.setSize(width, height, false);
-                }
-                return needResize;
-            }
-
-            
-
-            function render (time) {
-                time *= 0.001;
-
-                if (resizeRendererToDisplaySize(renderer)) {
-                    const canvas = renderer.domElement;
-                    camera.aspect = canvas.clientWidth / canvas.clientHeight;
-                    camera.updateProjectionMatrix();
-                }
-
-                objects.forEach((object, ndx) => {
-                    const speed = .1 ;
-                    const rot = time * speed;
-                    // object.rotation.x = rot;
-                    // object.rotation.y = rot;
-                    const yOff = Math.abs(Math.sin(time * 1 + ndx));
-                    // move the sphere up and down
-                    object.position.z = 0 + THREE.MathUtils.lerp(-22, 25, yOff);
-                    // object.position.z +=5
-                    // let current = "go";
-                    // if(object.position.z === 100){
-                    //     current = "back"
-                    // }
-                    // else if(object.position.z === 0){
-                    //     current = "go";
-                    // }
-                    // if(current =="go"){
-                    //     object.position.z +=5;
-                    // }
-                    // else{
-                    //     object.position.z -=5;
-                    // }
-                });
-                
-                renderer.render(scene,camera);
-
-                requestAnimationFrame(render)
-            }
-            requestAnimationFrame(render)
-        }
-        main();
+        
 
 
    </script>
+   <script type="module">
+        import * as THREEw from 'https://threejsfundamentals.org/threejs/resources/threejs/r127/build/three.module.js';
+        import {OrbitControls} from 'https://threejsfundamentals.org/threejs/resources/threejs/r127/examples/jsm/controls/OrbitControls.js';
+        const canvas = document.querySelector('#c');
+        const renderer = new THREEw.WebGLRenderer({canvas})
+/* Fullscreen */
+	renderer.setSize( window.innerWidth, window.innerHeight );
+/* Append to HTML */
+	//document.body.appendChild( renderer.domElement );
+	var onRenderFcts= [];
+	var scene	= new THREEw.Scene();
+	var camera	= new THREEw.PerspectiveCamera(25, window.innerWidth /    window.innerHeight, 0.01, 1000);
+/* Play around with camera positioning */
+	camera.position.z = 15; 
+  camera.position.y = 2;
+/* Fog provides depth to the landscape*/
+  scene.fog = new THREEw.Fog(0x000, 0, 45);
+	;(function(){
+		var light	= new THREEw.AmbientLight( 0x202020 )
+		scene.add( light )
+		var light	= new THREEw.DirectionalLight('white', 5)
+		light.position.set(0.5, 0.0, 2)
+		scene.add( light )
+		var light	= new THREEw.DirectionalLight('white', 0.75*2)
+		light.position.set(-0.5, -0.5, -2)
+		scene.add( light )		
+	})()
+	var heightMap	= THREEx.Terrain.allocateHeightMap(256,256)
+	THREEx.Terrain.simplexHeightMap(heightMap)
+    console.log(heightMap);	
+	var geometry	= THREEx.Terrain.heightMapToPlaneGeometry(heightMap)
+	THREEx.Terrain.heightMapToVertexColor(heightMap, geometry)
+/* Wireframe built-in color is white, no need to change that */
+	var material	= new THREEw.MeshBasicMaterial({
+		wireframe: true
+	});
+	var mesh	= new THREEw.Mesh( geometry, material );
+	//scene.add( mesh );
+	mesh.lookAt(new THREEw.Vector3(0,1,0));
+/* Play around with the scaling */
+	mesh.scale.y	= 3.5;
+	mesh.scale.x	= 3;
+	mesh.scale.z	= 0.20;
+	mesh.scale.multiplyScalar(10);
+/* Play around with the camera */
+	onRenderFcts.push(function(delta, now){
+		mesh.rotation.z += 0.2 * delta;	
+	})
+	onRenderFcts.push(function(){
+		renderer.render( scene, camera );		
+	})
+	var lastTimeMsec= null
+	requestAnimationFrame(function animate(nowMsec){
+		requestAnimationFrame( animate );
+		lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+		var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
+		lastTimeMsec	= nowMsec
+		onRenderFcts.forEach(function(onRenderFct){
+			onRenderFct(deltaMsec/1000, nowMsec/1000)
+		})
+	})
+   
+
+        // function main (){
+
+        //     const canvas = document.querySelector('#c');
+        //     const renderer = new THREEw.WebGLRenderer({canvas})
+
+        //     const fov = 40;
+        //     const aspect = 2;  // the canvas default
+        //     const near = 0.1;
+        //     const far = 1000;
+        //     const camera = new THREEw.PerspectiveCamera(fov,aspect,near,far);
+            // camera.position.z = (window.innerWidth > 686 )?120:300;
+
+            // // const scene = new THREEw.Scene();
+            // {
+            //     const near = 1;
+            //     const far = (window.innerWidth > 686 )?180:560;
+                
+            // }
+
+
+            // {
+            //     const color = 0xFFFFFF;
+            //     const intensity = 1;
+            //     const light = new THREEw.DirectionalLight(color, intensity);
+            //     light.position.set(-1, 2, 4);
+            //     scene.add(light);
+            //     console.log(scene);
+            // }
+            // {
+            //     const color = 0xFFFFFF;
+            //     const intensity = 1;
+            //     const light = new THREEw.DirectionalLight(color, intensity);
+            //     light.position.set(1, -2, -4);
+            //     scene.add(light);
+            // }
+            
+            // {
+            //     const loader = new THREEw.FontLoader();
+            //     // promisify font loading
+            //     function loadFont(url) {
+            //         return new Promise((resolve, reject) => {
+            //         loader.load(url, resolve, undefined, reject);
+            //         });
+            // }
+            
+            // const makeMaterial = () => {
+            //     const color = 0x44aa88;
+            //     const material = new THREEw.MeshPhongMaterial({color});
+            //     const hue = Math.random();
+            //     const saturation = 1;
+            //     const luminance = .5;
+            //     material.color.setHSL(hue, saturation, luminance);
+            //     return material
+            // }
+
+            // const fontSetting = (font) =>{
+            //     return{
+            //         font: font,
+            //         size: 4.0,
+            //         height: .2,
+            //         curveSegments: 12,
+            //         bevelEnabled: true,
+            //         bevelThickness: 0.95,
+            //         bevelSize: .3,
+            //         bevelSegments: 5,
+            //     }
+                
+            // }
+
+            // const makeInstance = (text,font) => {
+            //     const geometry = new THREEw.TextGeometry(text, fontSetting(font));
+                
+            //     const mesh = new THREEw.Mesh(geometry, makeMaterial());
+            //     geometry.computeBoundingBox();
+            //     geometry.boundingBox.getCenter(mesh.position).multiplyScalar(-1);
+            //     return mesh;
+            // }
+
+            // async function doit() {
+            //     const font = await loadFont('https://threejsfundamentals.org/threejs/resources/threejs/fonts/helvetiker_regular.typeface.json');  
+                
+                
+                
+
+            //     const parent2 = new THREEw.Object3D();
+            //     parent2.add(makeInstance('Jay Patel',font))
+            //     parent2.position.x = 0;
+            //     parent2.position.y = 0;
+            //     parent2.position.z =35;
+
+            
+            //     console.log(parent2);
+            //     scene.add(parent2);
+                
+                
+
+            //     objects.push(parent2);
+                
+            // }
+            //     doit();
+            // }
+
+            
+
+            // const objects = [
+                        
+            // ];
+
+            // renderer.render(scene, camera);
+            
+            // function resizeRendererToDisplaySize(renderer) {
+            //     const canvas = renderer.domElement;
+            //     const pixelRatio = window.devicePixelRatio;
+            //     const width  = canvas.clientWidth  * pixelRatio | 0;
+            //     const height = canvas.clientHeight * pixelRatio | 0;
+            //     const needResize = canvas.width !== width || canvas.height !== height;
+            //     if (needResize) {
+            //         renderer.setSize(width, height, false);
+            //     }
+            //     return needResize;
+            // }
+
+            
+
+            // function render (time) {
+            //     time *= 0.001;
+
+            //     if (resizeRendererToDisplaySize(renderer)) {
+            //         const canvas = renderer.domElement;
+            //         camera.aspect = canvas.clientWidth / canvas.clientHeight;
+            //         camera.updateProjectionMatrix();
+            //     }
+
+            //     objects.forEach((object, ndx) => {
+            //         const speed = .1 ;
+            //         const rot = time * speed;
+            //         // object.rotation.x = rot;
+            //         // object.rotation.y = rot;
+            //         const yOff = Math.abs(Math.sin(time * 1 + ndx));
+            //         // move the sphere up and down
+            //         //object.position.z = 0 + THREE.MathUtils.lerp(-22, 25, yOff);
+            //         // object.position.z +=5
+            //         // let current = "go";
+            //         // if(object.position.z === 100){
+            //         //     current = "back"
+            //         // }
+            //         // else if(object.position.z === 0){
+            //         //     current = "go";
+            //         // }
+            //         // if(current =="go"){
+            //         //     object.position.z +=5;
+            //         // }
+            //         // else{
+            //         //     object.position.z -=5;
+            //         // }
+            //     });
+                
+            //     renderer.render(scene,camera);
+
+            //     requestAnimationFrame(render)
+            // }
+            // requestAnimationFrame(render)
+
+            var mesh1    = new THREEx.Text('THREEx')
+            scene.add(mesh1)
+        // }
+        // main();
+       </script>
 </body>
 </html>
