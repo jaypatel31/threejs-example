@@ -13,7 +13,7 @@
 	var onRenderFcts= [];
 	var scene	= new THREE.Scene();
 	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000);
-	camera.position.z = 15;
+	camera.position.z = (window.outerWidth > 686 )?15:17;
 	camera.position.y = 2;
 	scene.fog = new THREE.Fog(0x000, 0, 45);
 	;(function(){
@@ -51,7 +51,7 @@
 	var mesh1	= new THREEx.Text('Web Developer', {
 		font        : "droid serif",
 		weight      : "bold",
-		size        : 0.5,
+		size        : (window.outerWidth > 686 )?1:0.5,
 		height      : 0.4,
 	})
 	mesh1.scale.multiplyScalar(1/2)
@@ -66,12 +66,12 @@
 	var mesh2	= new THREEx.Text('Researcher', {
 		font        : "droid serif",
 		weight      : "bold",
-		size        : 0.5,
+		size        : (window.outerWidth > 686 )?1:0.5,
 		height      : 0.4,
 	})
 	mesh2.scale.multiplyScalar(1/2)
 	mesh2.position.y = +3.0
-	mesh2.position.x = +2
+	mesh2.position.x = (window.outerWidth > 686 )?+8:+2
 	mesh2.material =  new THREE.MeshPhongMaterial({
 		color: 0x24FF00,    // red (can also use a CSS color string here)
 		flatShading: true
@@ -81,7 +81,7 @@
 	var mesh3	= new THREEx.Text('Community Contributor', {
 		font        : "droid serif",
 		weight      : "bold",
-		size        : 0.5,
+		size        : (window.outerWidth > 686 )?1:0.5,
 		height      : 0.4,
 	})
 	mesh3.scale.multiplyScalar(1/2)
@@ -96,12 +96,12 @@
 	var mesh4	= new THREEx.Text('Public Speaker', {
 		font        : "droid serif",
 		weight      : "bold",
-		size        : 0.5,
+		size        : (window.outerWidth > 686 )?1:0.5,
 		height      : 0.4,
 	})
 	mesh4.scale.multiplyScalar(1/2)
 	mesh4.position.y = +3.0
-	mesh4.position.x = -2
+	mesh4.position.x = (window.outerWidth > 686 )?-8:-2
 	mesh4.rotateY(0.2)
 	mesh4.material =  new THREE.MeshPhongMaterial({
 		color: 0x00D1FF,    // red (can also use a CSS color string here)
