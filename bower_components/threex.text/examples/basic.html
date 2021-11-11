@@ -33,7 +33,8 @@
 	THREEx.Terrain.heightMapToVertexColor(heightMap, geometry)
 /* Wireframe built-in color is white, no need to change that */
 	var material	= new THREE.MeshBasicMaterial({
-		wireframe: true
+		wireframe: true,
+		color: 0x569CD6
 	});
 	var mesh	= new THREE.Mesh( geometry, material );
 	scene.add( mesh );
@@ -47,10 +48,66 @@
 	//		add a text								//
 	//////////////////////////////////////////////////////////////////////////////////
 	
-	var mesh1	= new THREEx.Text('THREEx')
+	var mesh1	= new THREEx.Text('Web Developer', {
+		font        : "droid serif",
+		weight      : "bold",
+		size        : 0.5,
+		height      : 0.4,
+	})
 	mesh1.scale.multiplyScalar(1/2)
-	mesh1.position.y	= +0.6
+	mesh1.position.y = +1.6
+	mesh1.position.z = +4.0
+	mesh1.material =  new THREE.MeshPhongMaterial({
+		color: 0xFF0000,    // red (can also use a CSS color string here)
+		flatShading: true,
+	});
 	scene.add(mesh1)
+
+	var mesh2	= new THREEx.Text('Researcher', {
+		font        : "droid serif",
+		weight      : "bold",
+		size        : 0.5,
+		height      : 0.4,
+	})
+	mesh2.scale.multiplyScalar(1/2)
+	mesh2.position.y = +3.0
+	mesh2.position.x = +8
+	mesh2.material =  new THREE.MeshPhongMaterial({
+		color: 0x24FF00,    // red (can also use a CSS color string here)
+		flatShading: true
+	});
+	scene.add(mesh2)
+
+	var mesh3	= new THREEx.Text('Community Contributor', {
+		font        : "droid serif",
+		weight      : "bold",
+		size        : 0.5,
+		height      : 0.4,
+	})
+	mesh3.scale.multiplyScalar(1/2)
+	mesh3.position.y = +5.0
+
+	mesh3.material =  new THREE.MeshPhongMaterial({
+		color: 0xDB00FF,    // red (can also use a CSS color string here)
+		flatShading: true
+	});
+	scene.add(mesh3)
+
+	var mesh4	= new THREEx.Text('Public Speaker', {
+		font        : "droid serif",
+		weight      : "bold",
+		size        : 0.5,
+		height      : 0.4,
+	})
+	mesh4.scale.multiplyScalar(1/2)
+	mesh4.position.y = +3.0
+	mesh4.position.x = -8
+	mesh4.rotateY(0.2)
+	mesh4.material =  new THREE.MeshPhongMaterial({
+		color: 0x00D1FF,    // red (can also use a CSS color string here)
+		flatShading: true
+	});
+	scene.add(mesh4)
 		
 	//////////////////////////////////////////////////////////////////////////////////
 	//		Camera Controls							//
